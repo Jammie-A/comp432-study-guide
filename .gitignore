@@ -1,0 +1,9 @@
+node_modules
+dist
+
+# Local-only content close to graded lab-assignment solutions (see src/private.tsx). Never commit.
+src/private/
+
+# Local editor/agent settings
+.claude/
+.DS_Store
