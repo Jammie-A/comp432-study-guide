@@ -454,6 +454,35 @@ print(x.reshape(-1, 2).max(axis=1))`),
       "Weight sharing: the same kernel slides over any length. A dense layer's count would grow with the input size."),
   ],
   // ---------------- Labs ----------------
+  "labs/python": [
+    mc("code", "What does this print?", ["[2]", "[1, 2]", "an IndexError", "[2, None]"], 0,
+      "The starts are 0, 2, 4. The last slice {{perm[4:6]}} runs past the end and is cut short, so the last minibatch has one element.",
+      r`perm = [3, 0, 4, 1, 2]
+batches = [perm[s:s + 2] for s in range(0, 5, 2)]
+print(batches[-1])`),
+    num("code", "What does this print?", 7,
+      "{{g(1) = f(f(1)) = f(3) = 2·3 + 1 = 7}}.",
+      r`f = lambda x: 2 * x + 1
+g = lambda x: f(f(x))
+print(g(1))`),
+    mc("code", "What does this print?", ["10", "5", "an error: Double has no __call__", "None"], 0,
+      "{{Double}} inherits {{__call__}} from {{Module}}, so {{Double()(5)}} runs {{forward(5)}}. This is how {{model(x)}} works in PyTorch.",
+      r`class Module:
+    def __call__(self, x):
+        return self.forward(x)
+
+class Double(Module):
+    def forward(self, x):
+        return 2 * x
+
+print(Double()(5))`),
+    mc("code", "What does this print?", ["0.67", "0.66", "0.6667", "2/3"], 0,
+      "{{:.2f}} rounds to 2 decimals: 0.666… → 0.67.",
+      r`print(f"{2/3:.2f}")`),
+    num("code", "What does this print?", 32,
+      "{{zip}} pairs (1, 4), (2, 5), (3, 6): 4 + 10 + 18 = 32, a dot product.",
+      r`print(sum(a * b for a, b in zip([1, 2, 3], [4, 5, 6])))`),
+  ],
   "labs/numpy": [
     mc("code", "What does this print?", ["100.0", "0.0", "1.0", "an error"], 0,
       "{{x[:, :2]}} is a view: it shares memory with x, so writing into y changes x too.",
@@ -470,6 +499,25 @@ print(X.mean(axis=0).shape)`),
     mc("formula", "To shuffle a dataset, which code keeps every input with its label?",
       ["{{perm = rng.permutation(N); X, Y = X[perm], Y[perm]}}", "{{X, Y = X[rng.permutation(N)], Y[rng.permutation(N)]}}", "{{rng.shuffle(X); rng.shuffle(Y)}}", "{{X, Y = X.T, Y.T}}"], 0,
       "One permutation applied to both arrays. Two separate shuffles break the pairing between inputs and labels."),
+    mc("code", "What does this print?", ["(4, 4)", "(4, 1)", "(4,)", "an error"], 0,
+      "Right-aligned, (4, 1) and (4,) become (4, 1) and (1, 4): both axes stretch. The silent broadcasting trap.",
+      r`import numpy as np
+print((np.ones((4, 1)) - np.ones(4)).shape)`),
+    mc("code", "What does this print?", ["[3 5 7]", "[ 3 12]", "15", "[0 3]"], 0,
+      "The rows are [0 1 2] and [3 4 5]. {{axis=0}} adds them column by column.",
+      r`import numpy as np
+X = np.arange(6).reshape(2, 3)
+print(X.sum(axis=0))`),
+    num("code", "What does this print?", 0.75,
+      "Predicted classes [0, 1, 1, 0] vs labels [0, 1, 0, 0]: 3 of 4 agree. The mean of a True/False array is the fraction of True.",
+      r`import numpy as np
+y_hat = np.array([0.2, 0.7, 0.9, 0.4])
+y = np.array([0, 1, 0, 0])
+print(((y_hat > 0.5).astype(float) == y).mean())`),
+    mc("code", "What does this print?", ["[0 3 2]", "3", "[-1  3  2]", "0"], 0,
+      "{{np.maximum}} compares entry by entry with 0 (this is the ReLU). {{np.max}} would return the single largest value, 3.",
+      r`import numpy as np
+print(np.maximum(np.array([-1, 3, 2]), 0))`),
   ],
   "labs/finite-differences": [
     num("calc", r`Central difference for $f(x) = x^2$ at $x = 1$ with $\epsilon = 0.5$: $\frac{f(1.5) - f(0.5)}{2\cdot0.5}$?`, 2,
@@ -477,6 +525,11 @@ print(X.mean(axis=0).shape)`),
     mc("formula", r`Why is the central-difference estimate with $\epsilon = 10^{-15}$ inaccurate?`,
       ["ε is too large, so the curve's shape matters", "f(x+ε) and f(x−ε) are almost equal, and floating-point rounding wipes out most digits of their difference", "Central differences only work for linear functions", "Python can't represent 10⁻¹⁵", "It isn't inaccurate"], 1,
       "Subtracting two nearly equal floating-point numbers (cancellation) leaves few correct digits, and dividing by the tiny 2ε amplifies the error."),
+    num("calc", r`For $f(x) = x^3$ the central difference equals $3x^2 + \epsilon^2$ exactly. What does it give at $x = 1$ with $\epsilon = 0.1$?`, 3.01,
+      r`$3\cdot1^2 + 0.1^2 = 3 + 0.01 = 3.01$. The true derivative is 3.`),
+    mc("formula", "Why is the central difference usually more accurate than the forward difference (f(x+ε) − f(x))/ε for the same ε?",
+      ["It uses more function evaluations per step", "Its error shrinks like ε², the forward difference's only like ε", "It avoids floating-point rounding", "It is exact for every polynomial", "It isn't more accurate"], 1,
+      "In the subtraction f(x+ε) − f(x−ε) the even-power terms cancel, so the leading error is of order ε²."),
   ],
   "labs/from-scratch": [
     mc("formula", "scikit-learn's {{LogisticRegression()}} with default settings, fit on the same data as our plain gradient descent on BCE, gives different weights. Why?",
@@ -485,6 +538,50 @@ print(X.mean(axis=0).shape)`),
     mc("formula", "In scikit-learn, what happens when you decrease C from 1 to 0.01?",
       ["Regularization gets 100 times weaker", "Regularization gets 100 times stronger, so the weights shrink", "The learning rate decreases", "The number of iterations decreases", "Nothing"], 1,
       r`$C$ multiplies the loss, not the penalty: $\lambda = 1/(CN)$, so a smaller C means a stronger penalty.`),
+    mc("code", "What does this print?", ["[-0.25  0.  ]", "[0.25 0.  ]", "[-0.5  0. ]", "[0. 0.]"], 0,
+      "All predictions are 0.5, errors [0.5, −0.5]. Entry 0: (1·0.5 + 2·(−0.5))/2 = −0.25. Entry 1: (0.5 − 0.5)/2 = 0.",
+      r`import numpy as np
+X_tilde = np.array([[1.0, 1], [2.0, 1]])
+y = np.array([0.0, 1.0])
+theta = np.zeros(2)
+y_hat = 1 / (1 + np.exp(-(X_tilde @ theta)))
+print(X_tilde.T @ (y_hat - y) / y.size)`),
+    mc("formula", "Multiclass logistic regression with N = 100, D = 2 and K = 4. What is the shape of {{(Y_hat - Y).T @ X_tilde / len(Y)}}?",
+      ["(4, 3)", "(3, 4)", "(100, 4)", "(4, 2)", "(4,)"], 0,
+      "(K, N) @ (N, D+1) → (K, D+1) = (4, 3): one row of parameters per class, the shape of W."),
+    num("code", "What does this print?", 0.5,
+      "Subtracting the row max gives [0, 0], so both entries are e⁰/2 = 0.5. Without the subtraction, e¹⁰⁰⁰ overflows to inf and the result is NaN.",
+      r`import numpy as np
+def softmax(Z):
+    e_Z = np.exp(Z - Z.max(axis=1, keepdims=True))
+    return e_Z / e_Z.sum(axis=1, keepdims=True)
+print(softmax(np.array([[1000.0, 1000.0]]))[0, 0])`),
+    mc("formula", "What does {{LinearRegression().fit(X, y).score(X, y)}} return?",
+      ["the MSE", "the R² coefficient of determination", "the accuracy", "the number of iterations", "the closed-form θ"], 1,
+      "For regressors scikit-learn's score is R²; for classifiers it is the accuracy."),
+  ],
+  "labs/pytorch-basics": [
+    mc("code", "What does this print?", ["tensor(8.)", "tensor(15.)", "tensor(6.)", "None"], 0,
+      r`$\frac{dy}{dx} = 2x + 2 = 8$ at $x = 3$.`,
+      r`x = torch.tensor(3.0, requires_grad=True)
+y = x ** 2 + 2 * x
+y.backward()
+print(x.grad)`),
+    mc("code", "What does this print?", ["tensor(8.)", "tensor(4.)", "tensor(16.)", "an error"], 0,
+      "Each backward() adds its gradient 2x = 4 to .grad: 4 + 4 = 8. That's why training loops call zero_grad().",
+      r`x = torch.tensor(2.0, requires_grad=True)
+(x ** 2).backward()
+(x ** 2).backward()
+print(x.grad)`),
+    mc("code", "What does this print?", ["torch.float64", "torch.float32", "torch.int64", "numpy.float64"], 0,
+      "{{from_numpy}} keeps NumPy's float64. The labs add {{.float()}} to match the model's float32 parameters.",
+      r`import numpy as np
+print(torch.from_numpy(np.array([1.0, 2.0])).dtype)`),
+    num("calc", "How many parameters does {{nn.Sequential(nn.Linear(2, 4), nn.Tanh(), nn.Linear(4, 1))}} have?", 17,
+      "(2·4 + 4) + (4·1 + 1) = 12 + 5 = 17. The Tanh has none."),
+    mc("code", "What does this print?", ["torch.Size([1, 1, 10, 12])", "torch.Size([1, 10, 12, 1])", "torch.Size([10, 12, 1, 1])", "torch.Size([1, 12, 10, 1])"], 0,
+      "permute(2, 0, 1) moves the last axis first: (1, 10, 12); unsqueeze(0) adds the batch axis: (1, 1, 10, 12).",
+      r`print(torch.zeros(10, 12, 1).permute(2, 0, 1).unsqueeze(0).shape)`),
   ],
   "labs/pytorch": [
     mc("formula", "{{torch.nn.Linear(784, 10)}}: what is the shape of its {{weight}}?",
@@ -498,6 +595,17 @@ print(X.mean(axis=0).shape)`),
     mc("formula", "Which scikit-learn model is the same as multiclass logistic regression?",
       ["{{MLPClassifier(hidden_layer_sizes=(10,))}}", "{{MLPClassifier(hidden_layer_sizes=())}}", "{{MLPClassifier(hidden_layer_sizes=(784,))}}", "{{LinearRegression()}}"], 1,
       "No hidden layers: the 784 inputs connect directly to the 10 softmax outputs."),
+    mc("formula", "A training loop calls {{loss.backward()}} but never {{optimizer.step()}}. What happens?",
+      ["Training works but is slower", "The gradients are computed but the parameters never change", "An error is raised", "The loss becomes NaN", "Only the biases are updated"], 1,
+      "step() is the line that applies p ← p − lr·p.grad. Without it nothing is learned, and nothing crashes."),
+    num("calc", "1,000 training examples, batch_size = 64, 10 epochs, and every minibatch (including the smaller last one) gets a step. How many times is {{optimizer.step()}} called?", 160,
+      "range(0, 1000, 64) has 16 starts (the last minibatch has 1000 − 15·64 = 40 examples), so 16 steps per epoch × 10 = 160."),
+    mc("formula", "In the MLP tutorial's NumPy backward pass with H = 32 hidden units and D = 2 inputs, what is the shape of {{W1_grad = Z1_grad.T @ X}}?",
+      ["(32, 2)", "(2, 32)", "(N, 32)", "(32,)", "(N, 2)"], 0,
+      "Z1_grad is (N, H), so Z1_grad.T @ X is (H, N) @ (N, D) = (H, D) = (32, 2), the shape of W1."),
+    mc("formula", "The model ends with {{nn.Sigmoid()}} and is trained with {{nn.BCEWithLogitsLoss()}}. What's wrong?",
+      ["Nothing", "The sigmoid is applied twice", "BCEWithLogitsLoss needs integer labels", "The labels must be one-hot", "Sigmoid can't be the last layer"], 1,
+      "BCEWithLogitsLoss expects logits and applies the sigmoid itself. Remove the Sigmoid layer, or switch to BCELoss."),
   ],
   "labs/conv-code": [
     mc("formula", "What is the shape of {{torch.nn.Conv2d(3, 8, 5).weight}}?",
@@ -505,6 +613,15 @@ print(X.mean(axis=0).shape)`),
       "(C_out, C_in, F, F): one F × F kernel per pair of output and input channel."),
     num("calc", "Without padding, stride 1, a 3 × 3 kernel on a 10 × 12 image gives an output of size 8 × ?", 10,
       r`$(H - F + 1)\times(W - F + 1) = 8 \times 10$.`),
+    num("calc", "Conv2d(1, 4, 3) without padding on (N, 1, 28, 28), then MaxPool2d(2), then Flatten. What is in_features of the next Linear layer?", 676,
+      "28 − 3 + 1 = 26, pooled to 13: (N, 4, 13, 13) → 4 · 13 · 13 = 676."),
+    num("calc", "How many parameters does {{Conv2d(3, 16, 3)}} have (with biases)?", 448,
+      "3 · 3 · 3 · 16 + 16 = 432 + 16 = 448, for any image size."),
+    num("calc", "Conv2d(3, 8, 3, stride=2) without padding on a 32 × 32 image: the output is 8 × H' × H'. What is H'?", 15,
+      "⌊(32 − 3)/2⌋ + 1 = 14 + 1 = 15."),
+    mc("formula", "What does {{torch.nn.MaxPool2d(2)}} do to a tensor of shape (1, 3, 7, 9)?",
+      ["(1, 3, 3, 4)", "(1, 3, 4, 5)", "(1, 1, 7, 9)", "(1, 3, 3.5, 4.5)", "(1, 6, 7, 9)"], 0,
+      "It halves height and width, rounding down: 7 → 3, 9 → 4. Channels and batch stay."),
   ],
   "labs/debugging": [
     mc("formula", "You train on just 8 examples for 500 epochs with a large learning rate, and the training loss stays high. What does this suggest?",
@@ -516,6 +633,15 @@ print(X.mean(axis=0).shape)`),
     mc("formula", "Memory grows with every evaluation minibatch until the program crashes. Which pair of fixes belongs together?",
       ["Bigger batches and a GPU", "Wrap evaluation in {{torch.no_grad()}} and store {{loss.item()}} instead of the loss tensor", "Call {{loss.backward()}} during evaluation", "Use {{model.train()}}", "Lower the learning rate"], 1,
       "Without no_grad, PyTorch builds a computation graph for every forward pass, and keeping the loss tensors keeps all those graphs alive."),
+    mc("formula", "Someone calls {{optimizer.zero_grad()}} after {{loss.backward()}} and before {{optimizer.step()}}, with plain SGD. What happens?",
+      ["Training works normally", "The parameters never change: the gradients are erased before they're used", "Gradients accumulate", "An error is raised", "The learning rate doubles"], 1,
+      "zero_grad() resets .grad to zero, so step() moves by lr · 0."),
+    mc("formula", "Why should the *test* DataLoader not use {{drop_last=True}}?",
+      ["It makes evaluation slower", "It silently skips test examples, so the reported error is computed on fewer examples", "Batch norm needs the last batch", "It reshuffles the test set", "It has no effect on test loaders"], 1,
+      "drop_last only fixes the batch-norm problem during training. At test time the model is in eval() mode and every example must count."),
+    mc("formula", "A model with Dropout is evaluated without {{model.eval()}}. What do you observe?",
+      ["Nothing changes", "The test error is worse than it should be and changes from run to run", "An error is raised", "Training gets faster", "Memory grows"], 1,
+      "Dropout keeps switching random units off at test time, so the predictions are noisy and degraded."),
   ],
 
   "l5/transfer": [

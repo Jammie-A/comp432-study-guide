@@ -124,7 +124,7 @@ print("theta (w1, w2, b) =", theta.round(3))
             They're enormous (thousands or more) with alternating signs: huge terms cancelling each other to produce values around
             ±1. That's the fingerprint of overfitting, and it motivates the next section: penalize large weights.
           </Think>
-          <FromLab to="labs/pytorch" label="PyTorch & MLPs on MNIST">
+          <FromLab to="labs/pytorch" label="Training an MLP in NumPy and PyTorch">
             The polynomial-fitting tutorial ran this experiment for M = 0 to 9 and found something surprising: <em>gradient
             descent</em> on the degree-9 polynomial overfits much less than the closed-form solution. The huge alternating
             weights lie along very flat, badly conditioned directions that GD hasn't reached after 20,000 steps, so stopping
@@ -275,7 +275,7 @@ print("P =", W1.size + b1.size + W2.size + b2.size, "= (D+1)H + (H+1)K =", (D + 
           <Callout kind="exam">
             Common questions: shapes of each W and b, number of parameters, and "why can't we use the identity as activation?"
           </Callout>
-          <FromLab to="labs/pytorch" label="PyTorch & MLPs on MNIST">
+          <FromLab to="labs/pytorch" label="Training an MLP in NumPy and PyTorch">
             In PyTorch, <code>nn.Linear(D, H)</code> stores <M>{t`\mathbf W`}</M> with shape <strong>(H, D)</strong>, one row
             per neuron, exactly as on this page. scikit-learn's <code>coefs_[0]</code> stores it the other way round: (D, H).
             Lab 4 also showed that <code>MLPClassifier(hidden_layer_sizes=())</code>, an MLP with no hidden layer, is
@@ -531,7 +531,7 @@ print(W1.grad, b1.grad, W2.grad, b2.grad)
               ["Closed form", "regression only", "regression only", "no"],
             ]}
           />
-          <FromLab to="labs/pytorch" label="PyTorch & MLPs on MNIST">
+          <FromLab to="labs/pytorch" label="Training an MLP in NumPy and PyTorch">
             The MLP tutorial writes these VJP rules for a whole minibatch in NumPy:{" "}
             <code>z2_grad = (y_hat - y) / N</code>, <code>w2_grad = H.T @ z2_grad</code>,{" "}
             <code>Z1_grad = np.outer(z2_grad, w2) * relu_derivative(Z1)</code>, <code>W1_grad = Z1_grad.T @ X</code>. Each

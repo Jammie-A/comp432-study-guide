@@ -202,3 +202,119 @@ export function Think({ q, children }: { q: ReactNode; children: ReactNode }) {
     </div>
   );
 }
+
+/** The functions a piece of lab code uses: what each one does, its shapes, and a tiny example with its result. */
+export function FnRef({ rows }: { rows: [string, ReactNode, ReactNode, string?, string?][] }) {
+  return (
+    <div className="table-wrap">
+      <Table
+        head={["Call", "What it does", "Shapes / types", "Example → result"]}
+        rows={rows.map(([call, does, shapes, ex, res]) => [
+          <code className="nowrap">{call}</code>,
+          does,
+          shapes,
+          ex ? (
+            <>
+              <code>{ex}</code>
+              {res !== undefined && (
+                <>
+                  {" "}→ <code>{res}</code>
+                </>
+              )}
+            </>
+          ) : (
+            ""
+          ),
+        ])}
+      />
+    </div>
+  );
+}
+
+export type WalkStep = {
+  /** 1-based line number, or an inclusive [from, to] range. */
+  line: number | [number, number];
+  say: ReactNode;
+  /** Variables after these lines run: [name, value or shape]. */
+  vars?: [string, ReactNode][];
+};
+
+/** Steps through a piece of code line by line: highlights the lines, says what they do, and shows the values they produce. */
+export function CodeWalk({ title, code, steps }: { title?: string; code: string; steps: WalkStep[] }) {
+  const [i, setI] = useState(0);
+  const [all, setAll] = useState(false);
+  const lines = code.replace(/^\n/, "").replace(/\s+$/, "").split("\n");
+  const range = (s: WalkStep) => (typeof s.line === "number" ? [s.line, s.line] : s.line);
+  const [from, to] = range(steps[i]);
+  const label = (s: WalkStep) => {
+    const [a, b] = range(s);
+    return a === b ? `Line ${a}` : `Lines ${a}–${b}`;
+  };
+  const detail = (s: WalkStep) => (
+    <>
+      <div>{s.say}</div>
+      {s.vars && s.vars.length > 0 && (
+        <table className="walk-vars">
+          <tbody>
+            {s.vars.map(([name, val], k) => (
+              <tr key={k}>
+                <td>
+                  <code>{name}</code>
+                </td>
+                <td>{typeof val === "string" ? <code>{val}</code> : val}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </>
+  );
+  return (
+    <div className="steps walk">
+      <div className="steps-title">{title ?? "Line by line"}</div>
+      <pre className="walk-code">
+        {lines.map((l, k) => {
+          const on = !all && k + 1 >= from && k + 1 <= to;
+          return (
+            <div key={k} className={on ? "walk-line on" : "walk-line"} aria-current={on ? "step" : undefined}>
+              <span className="walk-no">{k + 1}</span>
+              {l || " "}
+            </div>
+          );
+        })}
+      </pre>
+      {all ? (
+        <ol className="walk-all">
+          {steps.map((s, k) => (
+            <li key={k}>
+              <div className="step-title">{label(s)}</div>
+              {detail(s)}
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <div className="walk-say" aria-live="polite">
+          <div className="step-title">
+            {label(steps[i])} <span className="muted">({i + 1}/{steps.length})</span>
+          </div>
+          {detail(steps[i])}
+        </div>
+      )}
+      <div className="steps-controls">
+        {!all && (
+          <>
+            <button disabled={i === 0} className="ghost" onClick={() => setI(i - 1)}>
+              ← Back
+            </button>
+            <button disabled={i === steps.length - 1} onClick={() => setI(i + 1)}>
+              Next line →
+            </button>
+          </>
+        )}
+        <button className="ghost" onClick={() => setAll(!all)}>
+          {all ? "Step through instead" : "Show all as a list"}
+        </button>
+      </div>
+    </div>
+  );
+}

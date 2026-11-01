@@ -185,7 +185,9 @@ function Home({ done }: { done: Set<string> }) {
         </div>
       ))}
       <p className="muted">
-        The "Labs 1–5" sections cover the code from the lab tutorials and assignments, since the midterm includes the labs.
+        The "Labs 1–5" sections cover the code from the lab tutorials and assignments, since the midterm includes the labs. Each
+        one lists every function its code uses, with an example, and walks through the code line by line ("Next line"), showing
+        the values each line produces. If Python itself is the obstacle, start with "Python you need to read the lab code".
       </p>
     </article>
   );

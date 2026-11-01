@@ -496,7 +496,7 @@ print("grad =\n", grad.round(2))
             On MNIST (28×28 images, D = 784, K = 10), each row of W is itself a 28×28 "template" image for its digit: positive
             weights are evidence for, negative against. Linear models are interpretable.
           </Callout>
-          <FromLab to="labs/pytorch" label="PyTorch & MLPs on MNIST">
+          <FromLab to="labs/pytorch" label="Training an MLP in NumPy and PyTorch">
             The multiclass tutorial computes the softmax as <code>np.exp(Z - Z.max(axis=1, keepdims=True))</code>, then
             normalizes. Subtracting the row maximum avoids overflow and changes nothing, because the softmax only depends on
             differences of logits. In PyTorch (Lab 4), <code>CrossEntropyLoss</code> takes the raw logits and integer labels,

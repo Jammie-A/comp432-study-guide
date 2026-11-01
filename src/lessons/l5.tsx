@@ -350,7 +350,7 @@ y = np.array([0, 1, 0]); eps, K = 0.15, 3
 print("label smoothing:", (1 - eps) * y + eps / K)
 `}
           />
-          <FromLab to="labs/pytorch" label="PyTorch & MLPs on MNIST">
+          <FromLab to="labs/pytorch" label="Training an MLP in NumPy and PyTorch">
             The lab training loops call <code>model.train()</code> before training and <code>model.eval()</code> before
             evaluating, which switches dropout and batch norm. Evaluation also runs inside <code>with torch.no_grad():</code>.
             That's a different switch: it stops PyTorch from building a computation graph, which saves memory, and does

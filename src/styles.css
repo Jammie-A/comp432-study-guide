@@ -295,3 +295,17 @@ ul.tight li { margin: 2px 0; }
   font-size: 14px; color: var(--muted); font-style: italic;
   border: 1px dashed var(--border); border-radius: 8px; padding: 8px 12px;
 }
+
+/* Code walkthrough */
+.walk-code { background: var(--code-bg); border-radius: 8px; padding: 8px 0; margin: 8px 0; overflow-x: auto; }
+.walk-line { padding: 0 12px 0 0; white-space: pre; border-left: 3px solid transparent; }
+.walk-line.on { background: var(--accent-soft); border-left-color: var(--accent); }
+.walk-no { display: inline-block; width: 2.6em; padding-right: 0.8em; text-align: right; color: var(--muted); user-select: none; }
+.walk-say { min-height: 3.2em; margin: 6px 0 10px; }
+.walk-all { padding-left: 20px; }
+.walk-all li { margin-bottom: 10px; }
+table.walk-vars { border-collapse: collapse; margin: 6px 0; font-size: 14px; }
+table.walk-vars td { border: 1px solid var(--border); padding: 3px 8px; vertical-align: top; }
+table.walk-vars td:first-child { background: var(--code-bg); }
+code.nowrap { white-space: nowrap; }
+pre.snippet { background: var(--code-bg); border-radius: 6px; padding: 8px 12px; margin: 6px 0; overflow-x: auto; }

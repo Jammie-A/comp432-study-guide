@@ -395,7 +395,7 @@ for epoch in range(5):
             wrong if we delete <code>opt.zero_grad()</code>?" (gradients accumulate across epochs, so steps get wrong and too big)
             are typical.
           </Callout>
-          <FromLab to="labs/pytorch" label="PyTorch & MLPs on MNIST">
+          <FromLab to="labs/pytorch-basics" label="PyTorch tensors & autograd">
             The Lab 4 PyTorch tutorial checks autograd by hand: for{" "}
             <code>y = ((x + 2) ** 2 + 3).mean()</code> at x = (0, 1, 2), <code>y.backward()</code> gives{" "}
             <code>x.grad</code> = (4/3, 2, 8/3). The debugging tutorial's third bug is the missing{" "}
