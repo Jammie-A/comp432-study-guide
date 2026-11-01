@@ -81,6 +81,7 @@ export const lecture1: Lecture = {
           </ol>
           <H>Datasets and the feature matrix</H>
           <Formula
+            plain="The data set is N pairs (input, label). Stack the N inputs as the rows of a table X: row n is example n, column d is feature d."
             tex={t`\mathcal D = \{(\mathbf x_1,y_1),\dots,(\mathbf x_N,y_N)\},\qquad \mathbf X = \begin{pmatrix}x_{1,1}&\cdots&x_{1,D}\\\vdots&&\vdots\\x_{N,1}&\cdots&x_{N,D}\end{pmatrix}\in\mathbb R^{N\times D}`}
             symbols={[
               [t`\mathcal D`, "the dataset: a set of (input, label) pairs"],
@@ -153,6 +154,7 @@ print("petal length of all (column):", X[:, 2])
           </p>
           <H>The formula, decoded</H>
           <Formula
+            plain="For each example, take the prediction error and square it (so it's positive and big errors count more), then average over all N examples."
             title="Mean squared error"
             tex={t`\text{MSE} = \frac1N\sum_{n=1}^N(y_n - \hat y_n)^2`}
             symbols={[
@@ -216,6 +218,7 @@ print("y = 2x - 20  :", mse(2, -20))
           </p>
           <H>Accuracy</H>
           <Formula
+            plain="Count the examples where the predicted class equals the true class and divide by N: the fraction you got right."
             tex={t`\text{Acc} = \frac1N\sum_{n=1}^N \mathbb 1[\hat y_n = y_n]`}
             symbols={[
               [t`\mathbb 1[\cdot]`, "indicator: 1 if the statement is true, 0 if false"],
@@ -243,6 +246,7 @@ print("y = 2x - 20  :", mse(2, -20))
           />
           <H>Categorical cross-entropy (CCE)</H>
           <Formula
+            plain="For each example, take minus the log of the probability the model gave to the correct class (the one-hot y picks it out), then average over the examples. Confident and right gives about 0; confident and wrong gives a large value."
             tex={t`\text{CCE} = -\frac1N\sum_{n=1}^N\sum_{k=1}^K y_{n,k}\ln(p_{n,k}) = -\frac1N\sum_{n=1}^N\mathbf y_n^\top\ln(\mathbf p_n)`}
             symbols={[
               [t`\mathbf y_n`, <>the label as a <strong>one-hot</strong> vector: dog → (0, 1, 0)</>],

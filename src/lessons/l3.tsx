@@ -25,6 +25,7 @@ export const lecture3: Lecture = {
           </p>
           <H>The formula, decoded</H>
           <Formula
+            plain="Append a 1 to the input and put the bias after the weights; then the prediction is a single dot product: multiply input and parameters entry by entry and add up."
             tex={t`\tilde{\mathbf x} = \begin{pmatrix}x_1\\\vdots\\x_D\\1\end{pmatrix},\quad \theta = \begin{pmatrix}w_1\\\vdots\\w_D\\b\end{pmatrix}\in\mathbb R^{D+1},\qquad \hat y = \theta^\top\tilde{\mathbf x} = \sum_{d=1}^D w_dx_d + b\cdot 1`}
             symbols={[
               [t`\tilde{\mathbf x}`, <>"x-tilde": the <strong>bias-augmented</strong> input, x with a 1 appended at the end</>],
@@ -94,6 +95,7 @@ print("y_hat =", X_tilde @ theta)                            # all N predictions
           </p>
           <H>The formulas, decoded</H>
           <Formula
+            plain="Stack all augmented inputs as the rows of X̃. Then all predictions are X̃θ at once, the residuals are prediction minus label, the loss is the mean squared residual, and the gradient is 2/N times X̃ᵀ times the residuals: each example's input weighted by its error."
             tex={t`\tilde{\mathbf X}_{\text{train}} = \begin{pmatrix}\tilde{\mathbf x}_1^\top\\\vdots\\\tilde{\mathbf x}_N^\top\end{pmatrix}\in\mathbb R^{N\times(D+1)},\quad \hat{\mathbf y} = \tilde{\mathbf X}\theta,\quad \mathbf r = \hat{\mathbf y}-\mathbf y,\quad J = \tfrac1N\mathbf r^\top\mathbf r,\quad \nabla_\theta J = \tfrac2N\tilde{\mathbf X}^\top\mathbf r`}
             symbols={[
               [t`\tilde{\mathbf X}`, "design matrix: one augmented example per ROW"],
@@ -101,6 +103,16 @@ print("y_hat =", X_tilde @ theta)                            # all N predictions
               [t`\mathbf r\in\mathbb R^N`, <>residual vector (errors), <M>{t`r_n = \hat y_n - y_n`}</M></>],
               [t`\mathbf r^\top\mathbf r`, <>sum of squared errors <M>{t`\sum_n r_n^2`}</M></>],
               [t`\tilde{\mathbf X}^\top\mathbf r`, <>shape (D+1, N)·(N,) = (D+1,): same shape as θ ✓. It equals <M>{t`\sum_n r_n\tilde{\mathbf x}_n`}</M>: each example's input weighted by its error.</>],
+            ]}
+          />
+          <Steps
+            title="Where ∇J = 2/N · X̃ᵀr comes from"
+            steps={[
+              { title: "One parameter at a time (Lecture 2's chain rule)", body: <MB>{t`\frac{\partial J}{\partial\theta_d} = \frac1N\sum_{n=1}^N 2r_n\,\frac{\partial\hat y_n}{\partial\theta_d},\qquad r_n = \hat y_n - y_n`}</MB> },
+              { title: "The prediction is a weighted sum, so its slope in θ_d is the input that θ_d multiplies", body: <MB>{t`\hat y_n = \sum_{d'}\theta_{d'}\tilde x_{n,d'}\quad\Rightarrow\quad\frac{\partial\hat y_n}{\partial\theta_d} = \tilde x_{n,d}`}</MB> },
+              { title: "Put it in", body: <><MB>{t`\frac{\partial J}{\partial\theta_d} = \frac2N\sum_{n=1}^N\tilde x_{n,d}\,r_n`}</MB><p>Feature d of every example, weighted by that example's error, summed.</p></> },
+              { title: "Recognize a matrix product", body: <><p>That sum is the dot product of <strong>column d</strong> of X̃ with r. Column d of X̃ is <strong>row d</strong> of X̃ᵀ, so computing it for every d at once is X̃ᵀr:</p><MB>{t`\nabla_\theta J = \frac2N\tilde{\mathbf X}^\top\mathbf r`}</MB></> },
+              { title: "Check against Lecture 2 (D = 1, x̃ₙ = (xₙ, 1))", body: <MB>{t`\frac2N\tilde{\mathbf X}^\top\mathbf r = \begin{pmatrix}\frac2N\sum_n x_nr_n\\ \frac2N\sum_n r_n\end{pmatrix} = \begin{pmatrix}\partial J/\partial w\\ \partial J/\partial b\end{pmatrix}\ \checkmark`}</MB> },
             ]}
           />
           <H>Worked example (slides 16–18)</H>
@@ -192,6 +204,7 @@ print("grad", grad.round(4), " theta_1", theta, " J_1", round(((X @ theta - y)**
           <p>That's exactly where 1000 GD steps ended up — but in one shot.</p>
           <H>The Hessian: second derivatives</H>
           <Formula
+            plain="The table of second derivatives: entry (i, j) says how the slope along θ_i changes when θ_j moves. For linear regression it is 2/N X̃ᵀX̃, the same everywhere, because the loss is a perfect bowl."
             tex={t`\mathbf H = \nabla^2_\theta J = \tfrac2N\tilde{\mathbf X}^\top\tilde{\mathbf X}\in\mathbb R^{P\times P},\qquad H_{ij} = \frac{\partial^2J}{\partial\theta_i\,\partial\theta_j}`}
             symbols={[
               [t`\mathbf H`, "Hessian: matrix of all second derivatives — the curvature of the loss"],
@@ -262,6 +275,7 @@ print("Hessian eigenvalues:", eig, " kappa =", eig.max() / eig.min())
           </p>
           <H>The sigmoid</H>
           <Formula
+            plain="Squashes any number into (0, 1) so it can be read as a probability: large positive z gives nearly 1, large negative z nearly 0, and z = 0 gives 0.5. Its slope is σ(1 − σ), largest (0.25) at z = 0."
             tex={t`\sigma(z) = \frac{1}{1+e^{-z}}\in(0,1), \qquad \frac{d\sigma}{dz} = \sigma(z)\,(1-\sigma(z))`}
             symbols={[
               [t`z`, <>the <strong>logit</strong>: the raw linear output <M>{t`\theta^\top\tilde{\mathbf x}`}</M>, any real number</>],
@@ -269,9 +283,20 @@ print("Hessian eigenvalues:", eig, " kappa =", eig.max() / eig.min())
               [t`\sigma(z)(1-\sigma(z))`, "the derivative is expressed through σ itself — handy for the gradient"],
             ]}
           />
+          <Steps
+            title="Where σ′ = σ(1 − σ) comes from"
+            steps={[
+              { title: "Write σ as a power", body: <MB>{t`\sigma(z) = (1 + e^{-z})^{-1}`}</MB> },
+              { title: "Chain rule: outer derivative of u⁻¹ is −u⁻², inner derivative of 1 + e⁻ᶻ is −e⁻ᶻ", body: <MB>{t`\sigma'(z) = -(1+e^{-z})^{-2}\cdot(-e^{-z}) = \frac{e^{-z}}{(1+e^{-z})^2}`}</MB> },
+              { title: "Split into two fractions", body: <MB>{t`\sigma'(z) = \frac{1}{1+e^{-z}}\cdot\frac{e^{-z}}{1+e^{-z}}`}</MB> },
+              { title: "The second fraction is 1 − σ (add and subtract 1 in the numerator)", body: <MB>{t`\frac{e^{-z}}{1+e^{-z}} = \frac{(1+e^{-z}) - 1}{1+e^{-z}} = 1 - \sigma(z)`}</MB> },
+              { title: "Result", body: <p><M>{t`\sigma'(z) = \sigma(z)(1-\sigma(z))`}</M>. At z = 0: 0.5 · 0.5 = 0.25, the largest it can be. That small maximum is why deep sigmoid networks suffer from vanishing gradients (Lecture 5).</p> },
+            ]}
+          />
           <SigmoidWidget />
           <H>Model and loss</H>
           <Formula
+            plain="Predict the probability of class 1 with the sigmoid of a linear model. The loss is minus the log of the probability given to the true class (ŷ if y = 1, 1 − ŷ if y = 0), averaged over the examples."
             tex={t`\hat y_n = \sigma(\theta^\top\tilde{\mathbf x}_n),\qquad J(\theta) = -\frac1N\sum_{n=1}^N\Big[y_n\ln\hat y_n + (1-y_n)\ln(1-\hat y_n)\Big]`}
             symbols={[
               [t`y_n\in\{0,1\}`, "label: 0 = versicolor, 1 = virginica"],
@@ -335,7 +360,7 @@ print(f"z = {z:.2f}, y_hat = {y_hat:.3f}, J_n = {J_n:.3f}")
           <Steps
             title="Chain: θ → zₙ → ŷₙ → Jₙ"
             steps={[
-              { title: "Loss w.r.t. prediction", body: <MB>{t`\frac{\partial J_n}{\partial\hat y_n} = -\frac{y_n}{\hat y_n} + \frac{1-y_n}{1-\hat y_n} = \frac{\hat y_n - y_n}{\hat y_n(1-\hat y_n)}`}</MB> },
+              { title: "Loss w.r.t. prediction (d/du of ln u is 1/u)", body: <><MB>{t`\frac{\partial J_n}{\partial\hat y_n} = -\frac{y_n}{\hat y_n} + \frac{1-y_n}{1-\hat y_n}`}</MB><p>Common denominator <M>{t`\hat y_n(1-\hat y_n)`}</M>:</p><MB>{t`= \frac{-y_n(1-\hat y_n) + (1-y_n)\hat y_n}{\hat y_n(1-\hat y_n)} = \frac{-y_n + y_n\hat y_n + \hat y_n - y_n\hat y_n}{\hat y_n(1-\hat y_n)} = \frac{\hat y_n - y_n}{\hat y_n(1-\hat y_n)}`}</MB></> },
               { title: "Prediction w.r.t. logit (sigmoid derivative)", body: <MB>{t`\frac{\partial\hat y_n}{\partial z_n} = \hat y_n(1-\hat y_n)`}</MB> },
               { title: "Logit w.r.t. parameters", body: <MB>{t`\frac{\partial z_n}{\partial\theta} = \tilde{\mathbf x}_n`}</MB> },
               { title: "Multiply: the ŷ(1−ŷ) terms cancel!", body: <MB>{t`\nabla_\theta J_n = \frac{\hat y_n - y_n}{\hat y_n(1-\hat y_n)}\cdot\hat y_n(1-\hat y_n)\cdot\tilde{\mathbf x}_n = (\hat y_n - y_n)\,\tilde{\mathbf x}_n`}</MB> },
@@ -428,6 +453,7 @@ print("theta =", theta.round(2))
           </p>
           <H>Parameters as a matrix</H>
           <Formula
+            plain="One parameter vector per class, stacked as the rows of W̃. Multiplying it by the augmented input gives one score (logit) per class."
             tex={t`\tilde{\mathbf W} = \begin{pmatrix}\theta_1^\top\\\vdots\\\theta_K^\top\end{pmatrix}\in\mathbb R^{K\times(D+1)},\qquad \mathbf z_n = \tilde{\mathbf W}\tilde{\mathbf x}_n = \begin{pmatrix}\theta_1^\top\tilde{\mathbf x}_n\\\vdots\\\theta_K^\top\tilde{\mathbf x}_n\end{pmatrix} = \mathbf W\mathbf x_n + \mathbf b`}
             symbols={[
               [t`\theta_k = (w_{k,1},\dots,w_{k,D},b_k)`, "the weights and bias of class k's linear model; one ROW of W̃"],
@@ -437,6 +463,7 @@ print("theta =", theta.round(2))
           />
           <H>The softmax</H>
           <Formula
+            plain="Turns K scores into K probabilities: exponentiate each score (making it positive), then divide by their sum (so they add up to 1). The largest score gets the largest probability."
             tex={t`\hat y_{n,k} = \frac{e^{z_{n,k}}}{\sum_{k'=1}^K e^{z_{n,k'}}}\in(0,1),\qquad \sum_{k=1}^K\hat y_{n,k} = 1`}
             symbols={[
               [t`e^{z}`, "makes every score positive, and preserves the order"],
@@ -457,6 +484,16 @@ print("theta =", theta.round(2))
               { title: "CCE loss: only the true class's term survives", body: <MB>{t`J_n = -\sum_k y_{n,k}\ln\hat y_{n,k} = -\ln 0.32 \approx 1.14`}</MB> },
               { title: "Gradient: error × input again (outer product)", body: <MB>{t`\nabla_{\tilde{\mathbf W}}J_n = (\hat{\mathbf y}_n - \mathbf y_n)\tilde{\mathbf x}_n^\top \approx \begin{pmatrix}0.65\\-0.68\\0.03\end{pmatrix}\begin{pmatrix}4.0&1.3&1\end{pmatrix} \approx \begin{pmatrix}2.59&0.84&0.65\\-2.72&-0.88&-0.68\\0.13&0.04&0.03\end{pmatrix}`}</MB> },
               { title: "Read the gradient", body: <p>Row 2 (versicolor) is negative → GD <em>increases</em> versicolor's weights (−η·negative = +). Row 1 (setosa) positive → GD decreases setosa's weights. Exactly what we want.</p> },
+            ]}
+          />
+          <Steps
+            title="Why the gradient is (ŷ − y) x̃ᵀ"
+            steps={[
+              { title: "Loss of one example whose true class is c (the one-hot y keeps only that term)", body: <MB>{t`J_n = -\ln\hat y_{n,c} = -\ln\frac{e^{z_c}}{\sum_{k'}e^{z_{k'}}} = -z_c + \ln\sum_{k'}e^{z_{k'}}`}</MB> },
+              { title: "Differentiate with respect to logit z_k", body: <><MB>{t`\frac{\partial(-z_c)}{\partial z_k} = \begin{cases}-1 & k = c\\ 0 & k\ne c\end{cases} = -y_{n,k},\qquad \frac{\partial}{\partial z_k}\ln\sum_{k'}e^{z_{k'}} = \frac{e^{z_k}}{\sum_{k'}e^{z_{k'}}} = \hat y_{n,k}`}</MB><p>(The second one: derivative of ln u is 1/u, times the derivative of the sum, which is <M>{t`e^{z_k}`}</M>.)</p></> },
+              { title: "So the gradient with respect to the logits is the error", body: <MB>{t`\frac{\partial J_n}{\partial z_k} = \hat y_{n,k} - y_{n,k}\qquad\Longleftrightarrow\qquad \nabla_{\mathbf z}J_n = \hat{\mathbf y}_n - \mathbf y_n`}</MB> },
+              { title: "Each logit is a dot product, so row k of the gradient is error_k × input", body: <MB>{t`z_k = \theta_k^\top\tilde{\mathbf x}_n\ \Rightarrow\ \nabla_{\theta_k}J_n = (\hat y_{n,k} - y_{n,k})\,\tilde{\mathbf x}_n\qquad\Longrightarrow\qquad \nabla_{\tilde{\mathbf W}}J_n = (\hat{\mathbf y}_n - \mathbf y_n)\tilde{\mathbf x}_n^\top`}</MB> },
+              { title: "Same structure as before", body: <p>With K = 2 classes this is exactly logistic regression's <M>{t`(\hat y_n - y_n)\tilde{\mathbf x}_n`}</M>: softmax + cross-entropy and sigmoid + BCE both give "prediction minus label, times input".</p> },
             ]}
           />
           <H>Vector form for all N examples</H>

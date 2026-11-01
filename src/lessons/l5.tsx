@@ -27,6 +27,7 @@ export const lecture5: Lecture = {
           </p>
           <H>The scalar chain</H>
           <Formula
+            plain="A deep chain with one neuron per layer: each layer multiplies by a weight, adds a bias and applies the sigmoid; the loss compares the last output with y."
             sheet="no"
             tex={t`h_0 = x,\quad z_k = w_kh_{k-1} + b_k,\quad h_k = \sigma(z_k),\quad J = (h_L - y)^2`}
             symbols={[
@@ -56,6 +57,7 @@ export const lecture5: Lecture = {
           </Callout>
           <H>Fix for exploding gradients: gradient clipping</H>
           <Formula
+            plain="If the gradient is longer than C, shrink it to length C, keeping its direction; otherwise leave it as it is."
             sheet="no"
             tex={t`\mathbf g \leftarrow \mathbf g\cdot\min\left(1,\ \frac{C}{\|\mathbf g\|}\right)`}
             symbols={[
@@ -109,6 +111,7 @@ print(clip(np.array([0.3, 0.4]), 2.5))   # short enough → unchanged
           <p>ReLU can vanish only on one side (z &lt; 0); leaky ReLU never gives exactly 0.</p>
           <H>Remedy 2: gradient shortcuts</H>
           <Formula
+            plain="A skip connection adds a block's input to its output. In the backward pass the gradient then has a direct path through the addition, besides the path through the block, so it can't vanish completely."
             sheet="no"
             tex={t`\text{forward: } \mathbf s = \mathbf h^{(1)} + \mathbf h^{(2)},\qquad \text{backward: } \nabla_{\mathbf h^{(1)}}J = \underbrace{\nabla_{\mathbf s}J}_{\text{skipped }f^{(2)}} + (\mathbf J_{\mathbf h^{(1)}}\mathbf h^{(2)})^\top\nabla_{\mathbf s}J`}
             symbols={[
@@ -170,6 +173,7 @@ print(f"with shortcuts: first/last gradient ratio = {residual:.2f}")
           </p>
           <H>Input standardization</H>
           <Formula
+            plain="For each feature, subtract its mean over the training examples and divide by its standard deviation, so every feature has mean 0 and spread 1."
             sheet="no"
             tex={t`\mu_d = \frac1N\sum_{n=1}^N x_{n,d},\qquad \sigma_d^2 = \frac1N\sum_{n=1}^N(x_{n,d}-\mu_d)^2,\qquad \hat x_{n,d} = \frac{x_{n,d}-\mu_d}{\sigma_d}`}
             symbols={[
@@ -191,6 +195,7 @@ print(f"with shortcuts: first/last gradient ratio = {residual:.2f}")
           </Callout>
           <H>Batch normalization (BN)</H>
           <Formula
+            plain="The same standardization, but inside the network, for each unit, using the current minibatch's mean and variance; then a learned scale γ and shift β let the network undo it where that helps."
             sheet="no"
             tex={t`\mu_{\mathcal B,d} = \frac1B\sum_{n=1}^B z_{n,d},\quad \sigma^2_{\mathcal B,d} = \frac1B\sum_{n=1}^B(z_{n,d}-\mu_{\mathcal B,d})^2,\quad \hat z_{n,d} = \frac{z_{n,d}-\mu_{\mathcal B,d}}{\sqrt{\sigma^2_{\mathcal B,d}+\epsilon}},\quad \tilde z_{n,d} = \gamma_d\hat z_{n,d} + \beta_d`}
             symbols={[
@@ -275,6 +280,7 @@ print(((Z - mu) / sigma).round(2))
           </Callout>
           <H>Targets: label smoothing</H>
           <Formula
+            plain="Replace the one-hot target by a softened one: the true class gets 1 − ε + ε/K and every other class ε/K. The model is no longer pushed towards infinite confidence."
             sheet="no"
             tex={t`\tilde{\mathbf y} = (1-\epsilon)\,\mathbf y + \frac{\epsilon}{K}`}
             symbols={[
@@ -297,6 +303,7 @@ print(((Z - mu) / sigma).round(2))
             Different initializations and data orders make their errors partly cancel. Cost: E trainings and E forward passes.
           </p>
           <Formula
+            plain="During training, set each hidden unit to 0 with probability p and divide the survivors by 1 − p, so the expected value is unchanged. At test time, do nothing."
             sheet="no"
             title="Dropout (training only)"
             tex={t`\mathbf h \mapsto \mathbf m\odot\mathbf h/(1-p),\qquad m_i = 0 \text{ with probability } p`}
@@ -306,7 +313,8 @@ print(((Z - mu) / sigma).round(2))
               [t`1/(1-p)`, "rescales the survivors so each unit's expected value stays h"],
             ]}
           />
-          <p>Slide example, p = 0.5: <M>{t`(0,1,0,1)\odot(0.5,0.2,0.0,1.4)/0.5 = (0,\ 0.4,\ 0,\ 2.8)`}</M>.</p>
+          <p>Slide example, p = 0.5:</p>
+          <MB>{t`(0,1,0,1)\odot(0.5,0.2,0.0,1.4)/0.5 = (0,\ 0.4,\ 0,\ 2.8)`}</MB>
           <DropoutWidget />
           <Table
             head={["", "Ensemble", "Dropout"]}
@@ -374,6 +382,7 @@ print("label smoothing:", (1 - eps) * y + eps / K)
           <p>A convolution fixes both with <strong>local connections</strong> (each output looks at a small window) and <strong>weight sharing</strong> (the same kernel at every position). Shifting the input shifts the output.</p>
           <H>The 1-D convolution</H>
           <Formula
+            plain="Output i is the dot product of the F kernel weights with a window of F consecutive inputs, starting at position (i − 1)s + 1, plus a bias. The same weights are reused at every position."
             sheet="no"
             tex={t`z_i = \sum_{j=1}^{F} w_j\,x_{(i-1)s + j} + b \qquad(\text{input already zero-padded})`}
             symbols={[
@@ -383,11 +392,18 @@ print("label smoothing:", (1 - eps) * y + eps / K)
             ]}
           />
           <Formula
+            plain="Pad the input with P zeros on each side (length D + 2P), then count how many positions a window of size F can start at when it jumps s steps at a time."
             sheet="no"
             title="Output length"
             tex={t`D_{\text{out}} = \left\lfloor\frac{D + 2P - F}{s}\right\rfloor + 1`}
             symbols={[[t`\lfloor\cdot\rfloor`, "round down"]]}
           />
+          <Think q="Where does ⌊(D + 2P − F)/s⌋ + 1 come from?">
+            After padding the input has D + 2P entries. A window of F entries fits at start positions 0, s, 2s, … as long as
+            its last entry stays inside, i.e. while the start is at most D + 2P − F. The number of multiples of s from 0 to
+            D + 2P − F is <M>{t`\lfloor(D+2P-F)/s\rfloor`}</M>, plus 1 for the start at 0. With s = 1 and P = 0 this is the familiar
+            D − F + 1.
+          </Think>
           <Steps
             title="Slide example: x = (3, 5, 2, −1, 0, 4, −2, −3), kernel (−1, 0, 1), P = 1, s = 1"
             steps={[
@@ -457,6 +473,7 @@ print("max pool (2, stride 2):", xp.reshape(-1, 2).max(axis=1))
           </ul>
           <H>Counting parameters</H>
           <Formula
+            plain="Each of the C_out kernels has one weight per kernel position and per input channel, plus one bias. The input length doesn't appear, because the weights are shared across positions."
             sheet="no"
             tex={t`\text{1-D: } P_{\text{conv}} = F\cdot C_{\text{in}}\cdot C_{\text{out}} + C_{\text{out}}\qquad \text{2-D: } P_{\text{conv}} = F_1\cdot F_2\cdot C_{\text{in}}\cdot C_{\text{out}} + C_{\text{out}}`}
             symbols={[

@@ -79,6 +79,7 @@ export const lecture2: Lecture = {
 
           <H>The formula, decoded</H>
           <Formula
+            plain="Nudge θ by a tiny ε, see how much J changes, and divide by ε: the slope of J at θ, i.e. how fast the loss changes when θ moves."
             title="Derivative (one parameter)"
             tex={t`\frac{dJ}{d\theta} = \lim_{\epsilon\to 0}\frac{J(\theta+\epsilon) - J(\theta)}{\epsilon}`}
             symbols={[
@@ -93,6 +94,7 @@ export const lecture2: Lecture = {
             neighbours; the <em>global</em> minimum is the lowest overall.
           </p>
           <Formula
+            plain="Do the same for each parameter separately (nudge only θ_m and keep the others fixed), and stack the P slopes into a vector. The gradient points in the direction in which J increases fastest."
             title="Partial derivatives and the gradient (P parameters)"
             tex={t`\frac{\partial J}{\partial \theta_m} = \lim_{\epsilon\to 0}\frac{J(\theta+\epsilon\, \mathbf{e}_m) - J(\theta)}{\epsilon}, \qquad \nabla_\theta J = \left(\frac{\partial J}{\partial\theta_1},\dots,\frac{\partial J}{\partial\theta_P}\right)^{\top} \in \mathbb{R}^P`}
             symbols={[
@@ -183,6 +185,7 @@ print("numerical:", numerical_grad(J, theta))
           </p>
           <H>The formula, decoded</H>
           <Formula
+            plain="New parameters = old parameters minus a small step (η times the gradient): a step downhill on the loss."
             title="Gradient descent update"
             sheet="yes"
             tex={t`\theta_{t+1} = \theta_t - \eta\, \nabla_\theta J(\theta_t)`}
@@ -241,6 +244,7 @@ for t in range(5):
           </p>
           <H>The setup</H>
           <Formula
+            plain="Predict with a straight line (slope w, intercept b), measure the fit with the MSE, and treat w and b together as the parameter vector θ to optimize."
             tex={t`\hat y_n = w x_n + b, \qquad J(\theta) = \frac1N\sum_{n=1}^N(\hat y_n - y_n)^2, \qquad \theta = \begin{pmatrix}w\\b\end{pmatrix}`}
             symbols={[
               [t`x_n, y_n`, "the n-th training input and label (scalars here)"],
@@ -418,6 +422,7 @@ for epoch in range(5):
           </p>
           <H>The model problem: a quadratic valley</H>
           <Formula
+            plain="A bowl with curvature h₁ along θ₁ and h₂ along θ₂. The gradient in each direction is curvature times position, so steep directions (large h) produce large gradients."
             tex={t`J(\theta) = \tfrac12\,\theta^\top\begin{pmatrix}h_1 & 0\\ 0 & h_2\end{pmatrix}\theta = \tfrac12(h_1\theta_1^2 + h_2\theta_2^2), \qquad \nabla_\theta J = \begin{pmatrix}h_1\theta_1\\ h_2\theta_2\end{pmatrix}`}
             symbols={[
               [t`h_1, h_2`, "curvature in each direction. h₂ ≫ h₁ means the valley is steep across (θ₂) and flat along (θ₁)."],
@@ -426,6 +431,7 @@ for epoch in range(5):
             ]}
           />
           <Formula
+            plain="Keep a running velocity: at each step the old velocity shrinks by the factor ρ and the new gradient pushes it downhill; then the parameters move by the velocity. Consistent directions build up speed, zig-zags cancel out."
             title="Momentum update"
             sheet="yes"
             tex={t`\mathbf v_{t+1} = \rho\,\mathbf v_t - \eta\,\nabla_\theta J(\theta_t), \qquad \theta_{t+1} = \theta_t + \mathbf v_{t+1}`}
@@ -491,6 +497,7 @@ for t in range(3):
           </p>
           <H>The formula, decoded</H>
           <Formula
+            plain="The full loss is the average of the per-example losses. A minibatch loss averages only B randomly chosen examples, so its gradient is a cheap, noisy estimate of the full gradient."
             title="Minibatch loss and stochastic gradient"
             sheet="yes"
             tex={t`J_{\mathcal D}(\theta) = \frac1N\sum_{n=1}^N J_n(\theta), \qquad J_{\mathcal B}(\theta) = \frac1B\sum_{n\in\mathcal B} J_n(\theta), \qquad \mathbf g_{\mathcal B} = \nabla_\theta J_{\mathcal B}(\theta) = \frac1B\sum_{n\in\mathcal B}\nabla_\theta J_n(\theta)`}
@@ -581,6 +588,7 @@ for epoch in range(2):
           </p>
           <H>Step 1: adaptive step sizes (RMSProp-style)</H>
           <Formula
+            plain="Keep a running average of each parameter's squared gradient, and divide that parameter's step by its square root: parameters with large gradients take smaller steps, parameters with small gradients take larger ones."
             sheet="no"
             tex={t`\mathbf s_{t+1} = \beta_2\,\mathbf s_t + (1-\beta_2)\,\mathbf g_t\odot\mathbf g_t, \qquad \theta_{t+1} = \theta_t - \frac{\eta}{\epsilon + \sqrt{\mathbf s_{t+1}}}\odot\mathbf g_t`}
             symbols={[
@@ -594,6 +602,7 @@ for epoch in range(2):
           />
           <H>Step 2: Adam = momentum + adaptive step sizes</H>
           <Formula
+            plain="Momentum (a running average of the gradients: the direction) combined with RMSProp (a running average of the squared gradients: the scale). Step in the averaged direction, scaled separately for each parameter."
             sheet="no"
             tex={t`\begin{aligned}\mathbf v_{t+1} &= \beta_1\mathbf v_t + (1-\beta_1)\,\mathbf g_t &&\text{(1st moment: direction)}\\ \mathbf s_{t+1} &= \beta_2\mathbf s_t + (1-\beta_2)\,\mathbf g_t\odot\mathbf g_t &&\text{(2nd moment: scale)}\\ \theta_{t+1} &= \theta_t - \frac{\eta}{\epsilon+\sqrt{\mathbf s_{t+1}}}\odot\mathbf v_{t+1}\end{aligned}`}
             symbols={[

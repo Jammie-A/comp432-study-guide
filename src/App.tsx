@@ -5,6 +5,8 @@ import { M } from "./components/ui";
 import { QuizPage, SectionQuiz } from "./quiz/Quiz";
 import { allQuestions, useResults } from "./quiz/store";
 import { MockExam } from "./exam/MockExam";
+import { GlossaryPage, PageTerms } from "./components/terms";
+import { glossary } from "./glossary";
 
 function readHash() {
   const [, lec, sec] = window.location.hash.replace(/^#/, "").split("/");
@@ -80,6 +82,10 @@ export default function App() {
           <span className="check">⏱</span>
           Mock midterm (exam format)
         </a>
+        <a href="#/glossary" className={"nav-quiz" + (route.lec === "glossary" ? " active" : "")}>
+          <span className="check">Aa</span>
+          Glossary: {glossary.length} terms in plain words
+        </a>
         {lectures.map((l) => (
           <div key={l.id} className="nav-lecture">
             <div className="nav-lecture-title">
@@ -109,6 +115,7 @@ export default function App() {
             </div>
             <h1>{cur.sec.title}</h1>
             <p className="summary">{cur.sec.summary}</p>
+            <PageTerms here={key} />
             {cur.sec.body()}
             <SectionQuiz lecture={cur.lec.id} section={cur.sec.id} />
             <div className="lesson-footer">
@@ -131,6 +138,8 @@ export default function App() {
           <QuizPage />
         ) : route.lec === "exam" ? (
           <MockExam />
+        ) : route.lec === "glossary" ? (
+          <GlossaryPage focus={route.sec} />
         ) : (
           <Home done={done} />
         )}
@@ -158,6 +167,12 @@ function Home({ done }: { done: Set<string> }) {
         <div style={{ marginTop: 6 }}>
           Practise under exam conditions in the <a href="#/exam">mock midterm</a>, and drill single topics in the <a href="#/quiz">quiz</a>.
         </div>
+      </div>
+      <div className="callout note">
+        <div className="callout-label">New to the notation or the jargon?</div>
+        Start with <a href="#/start/notation">How to read the notation</a> and{" "}
+        <a href="#/start/vocabulary">The ML vocabulary in plain English</a>. Every section also lists the terms it uses at the
+        top: click one for its definition. All of them are in the <a href="#/glossary">glossary</a>.
       </div>
       <h3 className="lesson-h">How to use each section</h3>
       <ol className="howto">

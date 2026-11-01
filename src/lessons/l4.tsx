@@ -40,6 +40,7 @@ export const lecture4: Lecture = {
           </ul>
           <H>Linear basis function models</H>
           <Formula
+            plain="Replace the input x by a vector of M new features φ(x) (for example powers of x), plus a 1 for the bias. The model is still linear in its parameters."
             tex={t`\tilde\phi(\mathbf x) = \begin{pmatrix}\phi(\mathbf x)\\1\end{pmatrix}\in\mathbb R^{M+1},\qquad \phi:\mathbb R^D\to\mathbb R^M`}
             symbols={[
               [t`\phi(\mathbf x)`, "M non-linear basis functions applied to x"],
@@ -86,6 +87,7 @@ ax[1].plot([0, 2.5], [2.5, 0], "k--")
         <>
           <H>The setup</H>
           <Formula
+            plain="The polynomial features of a single number x are x, x², …, x^M and 1. The prediction is a polynomial of degree M, yet still a linear model in θ."
             tex={t`\tilde\phi(x) = (x,\ x^2,\ \dots,\ x^M,\ 1)^\top,\qquad \hat y = \theta^\top\tilde\phi(x) = w_1x + w_2x^2 + \dots + w_Mx^M + b`}
             symbols={[
               [t`M`, "the order (degree) of the polynomial"],
@@ -147,6 +149,7 @@ print("theta (w1, w2, b) =", theta.round(3))
             θ small.
           </p>
           <Formula
+            plain="Add a penalty proportional to the squared size of the parameters to the loss. Its gradient adds λθ, which pulls every parameter towards 0 at each step (weight decay)."
             title="L2 regularization (weight decay, ridge regression)"
             tex={t`\tilde J(\theta) = J(\theta) + \frac\lambda2\|\theta\|_2^2,\qquad \nabla_\theta\tilde J = \nabla_\theta J + \lambda\theta`}
             symbols={[
@@ -216,6 +219,7 @@ for lam in [0, 1e-5, 0.1]:
           </p>
           <H>One neuron → one layer</H>
           <Formula
+            plain="Each neuron j takes a weighted sum of all the inputs plus its bias (z_j), then applies the activation f. Stacking all the neurons, a layer is one matrix product plus a bias vector, followed by f on every entry."
             tex={t`z_j = \sum_i W_{ji}x_i + b_j,\quad h_j = f(z_j)\qquad\Longrightarrow\qquad \mathbf z = \mathbf W\mathbf x + \mathbf b,\quad \mathbf h = f(\mathbf z)`}
             symbols={[
               [t`z_j`, <>neuron j's <strong>pre-activation</strong>: a weighted sum of inputs plus bias</>],
@@ -228,6 +232,7 @@ for lam in [0, 1e-5, 0.1]:
           <p>Every input feeds every neuron: a <strong>fully-connected (dense) layer</strong>.</p>
           <H>The multi-layer perceptron (MLP)</H>
           <Formula
+            plain="A two-layer network: the first layer turns x into a hidden representation h (weighted sums, then the activation), and the second layer is a linear model on h."
             tex={t`\hat{\mathbf y} = \mathbf W^{(2)}\underbrace{f^{(1)}\big(\mathbf W^{(1)}\mathbf x + \mathbf b^{(1)}\big)}_{\text{hidden representation }\mathbf h} + \mathbf b^{(2)}`}
             symbols={[
               [t`\mathbf W^{(1)}\in\mathbb R^{H\times D}`, "first layer: input → H hidden neurons"],
@@ -432,6 +437,7 @@ print("numerical:", (J_of(w1, w2 + eps) - J) / eps, (J_of(w1 + eps, w2) - J) / e
         <>
           <H>The Jacobian</H>
           <Formula
+            plain="When a function maps A numbers to B numbers, its derivative is a B × A table: entry (j, i) says how much output j changes when input i moves."
             tex={t`\mathbf b = f(\mathbf a),\ \mathbf a\in\mathbb R^A,\ \mathbf b\in\mathbb R^B:\qquad \mathbf J_{\mathbf a}\mathbf b = \frac{\partial\mathbf b}{\partial\mathbf a^\top}\in\mathbb R^{B\times A},\quad [\mathbf J_{\mathbf a}\mathbf b]_{ji} = \frac{\partial b_j}{\partial a_i}`}
             symbols={[
               [t`\mathbf J_{\mathbf a}\mathbf b`, "all partial derivatives of the outputs w.r.t. the inputs: one ROW per output, one COLUMN per input"],

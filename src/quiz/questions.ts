@@ -11,6 +11,31 @@ function num(kind: QuizKind, prompt: string, answer: number, explain: string, co
 
 /** Questions per section, keyed "lectureId/sectionId". */
 export const quiz: Record<string, Question[]> = {
+  // ---------------- Start here ----------------
+  "start/notation": [
+    mc("formula", r`What does $\frac1N\sum_{n=1}^N a_n$ compute?`,
+      ["the sum of the $a_n$", "the average of the $a_n$", "the largest $a_n$", "the $N$-th entry"], 1,
+      "Add up all N values, then divide by N: the mean. In NumPy: {{a.mean()}}."),
+    mc("formula", r`$\mathbf X\in\mathbb R^{N\times D}$ and $\theta\in\mathbb R^{D}$. What is the shape of $\mathbf X\theta$?`,
+      ["(N,)", "(D,)", "(N, D)", "(D, N)"], 0,
+      "(N, D) times (D,) gives one dot product per row: N numbers, one prediction per example."),
+    mc("formula", r`What does $\arg\min_\theta J(\theta)$ denote?`,
+      ["the smallest value of J", "the θ at which J is smallest", "the gradient of J", "the derivative of θ"], 1,
+      "argmin returns the location of the minimum (the best parameters), min would return the value of J there."),
+    mc("formula", r`In $\hat y_n$, what do the hat and the subscript mean?`,
+      ["the label of feature n", "the model's prediction for example n", "the n-th parameter", "the average label"], 1,
+      "The hat marks an estimate (a prediction); the subscript n says which example."),
+  ],
+  "start/vocabulary": [
+    mc("formula", "Which of these is a hyperparameter, not a parameter?",
+      ["a weight of the first layer", "the bias of the output neuron", "the learning rate", "an entry of θ"], 2,
+      "Parameters are learned by training; the learning rate is chosen by you (on the validation set)."),
+    mc("formula", "A model has low training loss and much higher test loss. This is called…",
+      ["underfitting", "overfitting", "convergence", "regularization"], 1,
+      "It fits the training data (noise included) but doesn't generalize to new data."),
+    num("calc", "1,200 training examples, minibatches of 100. How many gradient steps are in one epoch?", 12,
+      "One epoch is one pass over all examples: 1200 / 100 = 12 minibatches, one step each."),
+  ],
   // ---------------- Lecture 1 ----------------
   "l1/notation": [
     mc("formula", r`The feature matrix is $\mathbf X\in\mathbb R^{N\times D}$. What does row $n$ contain?`,

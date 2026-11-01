@@ -25,12 +25,15 @@ export function Formula({
   symbols,
   title,
   sheet,
+  plain,
 }: {
   tex: string;
   symbols: [string, ReactNode][];
   title?: string;
   /** "yes": printed on the midterm formula sheet; "no": must be memorized. */
   sheet?: "yes" | "no";
+  /** The formula in plain words, shown under it. */
+  plain?: ReactNode;
 }) {
   return (
     <div className="formula">
@@ -45,6 +48,12 @@ export function Formula({
         </div>
       )}
       <MB>{tex}</MB>
+      {plain && (
+        <p className="formula-plain">
+          <strong>In words:</strong> {plain}
+        </p>
+      )}
+      <div className="table-wrap">
       <table className="symbols">
         <tbody>
           {symbols.map(([s, meaning], i) => (
@@ -57,6 +66,7 @@ export function Formula({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
@@ -122,6 +132,7 @@ export function FromLab({ to, label, children }: { to: string; label: string; ch
 /** Side by side: each math line next to the NumPy line that computes it. */
 export function MathCode({ rows }: { rows: [string, string, ReactNode?][] }) {
   return (
+    <div className="table-wrap">
     <table className="mathcode">
       <thead>
         <tr>
@@ -144,6 +155,7 @@ export function MathCode({ rows }: { rows: [string, string, ReactNode?][] }) {
         ))}
       </tbody>
     </table>
+    </div>
   );
 }
 
@@ -163,24 +175,26 @@ export function Slides({ lecture, pages }: { lecture: number; pages: string }) {
 /** Small table helper for worked examples. */
 export function Table({ head, rows }: { head: ReactNode[]; rows: ReactNode[][] }) {
   return (
-    <table className="data">
-      <thead>
-        <tr>
-          {head.map((h, i) => (
-            <th key={i}>{h}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((r, i) => (
-          <tr key={i}>
-            {r.map((c, j) => (
-              <td key={j}>{c}</td>
+    <div className="table-wrap">
+      <table className="data">
+        <thead>
+          <tr>
+            {head.map((h, i) => (
+              <th key={i}>{h}</th>
             ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={i}>
+              {r.map((c, j) => (
+                <td key={j}>{c}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -206,7 +220,7 @@ export function Think({ q, children }: { q: ReactNode; children: ReactNode }) {
 /** The functions a piece of lab code uses: what each one does, its shapes, and a tiny example with its result. */
 export function FnRef({ rows }: { rows: [string, ReactNode, ReactNode, string?, string?][] }) {
   return (
-    <div className="table-wrap">
+    <>
       <Table
         head={["Call", "What it does", "Shapes / types", "Example → result"]}
         rows={rows.map(([call, does, shapes, ex, res]) => [
@@ -227,7 +241,7 @@ export function FnRef({ rows }: { rows: [string, ReactNode, ReactNode, string?, 
           ),
         ])}
       />
-    </div>
+    </>
   );
 }
 
@@ -254,18 +268,20 @@ export function CodeWalk({ title, code, steps }: { title?: string; code: string;
     <>
       <div>{s.say}</div>
       {s.vars && s.vars.length > 0 && (
-        <table className="walk-vars">
-          <tbody>
-            {s.vars.map(([name, val], k) => (
-              <tr key={k}>
-                <td>
-                  <code>{name}</code>
-                </td>
-                <td>{typeof val === "string" ? <code>{val}</code> : val}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="table-wrap">
+          <table className="walk-vars">
+            <tbody>
+              {s.vars.map(([name, val], k) => (
+                <tr key={k}>
+                  <td>
+                    <code>{name}</code>
+                  </td>
+                  <td>{typeof val === "string" ? <code>{val}</code> : val}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </>
   );
