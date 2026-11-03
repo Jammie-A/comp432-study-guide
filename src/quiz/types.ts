@@ -1,7 +1,7 @@
 // Quiz question types.
 // Text fields support inline math as $...$ and inline code as {{...}}.
 
-export type QuizKind = "formula" | "calc" | "code";
+export type QuizKind = "formula" | "calc" | "code" | "reason";
 
 type Base = {
   kind: QuizKind;
@@ -9,6 +9,8 @@ type Base = {
   /** Code shown above the question (for "predict the output" questions). */
   code?: string;
   explain: string;
+  /** Goes beyond what the slides cover. */
+  extra?: boolean;
 };
 
 export type MCQuestion = Base & { type: "mc"; options: string[]; answer: number };
@@ -22,4 +24,5 @@ export const kindLabel: Record<QuizKind, string> = {
   formula: "Formula / concept",
   calc: "Hand calculation",
   code: "Predict the output",
+  reason: "Reasoning: what if / why",
 };

@@ -330,3 +330,5 @@ dl.glossary { margin: 8px 0; }
 .glossary-item dd { margin: 2px 0 0; }
 .glossary-item .term-where { display: inline-block; margin: 4px 0 0; }
 article p, article li { overflow-x: auto; }
+.qkind.reason { color: var(--c4); background: transparent; border: 1px solid var(--c4); }
+.qextra { padding: 1px 8px; border-radius: 999px; border: 1px dashed var(--muted); color: var(--muted); }

@@ -168,6 +168,13 @@ function Home({ done }: { done: Set<string> }) {
           Practise under exam conditions in the <a href="#/exam">mock midterm</a>, and drill single topics in the <a href="#/quiz">quiz</a>.
         </div>
       </div>
+      <div className="callout intuition">
+        <div className="callout-label">Practise deep understanding</div>
+        The <a href="#/practice/how-to-reason">Practice</a> chapter trains the kind of question the midterm asked: what happens
+        if you change something, what PyTorch code prints, why a result is what it is and how to fix it, and short math
+        without a calculator. It also covers some topics from beyond the slides. Test yourself under time pressure with the
+        mock exam's <a href="#/exam">deep-understanding mode</a>.
+      </div>
       <div className="callout note">
         <div className="callout-label">New to the notation or the jargon?</div>
         Start with <a href="#/start/notation">How to read the notation</a> and{" "}

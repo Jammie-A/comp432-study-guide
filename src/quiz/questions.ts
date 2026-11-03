@@ -1,4 +1,5 @@
 import { MCQuestion, NumQuestion, Question, QuizKind } from "./types";
+import { practiceQuiz } from "./practice";
 
 const r = String.raw;
 
@@ -11,6 +12,7 @@ function num(kind: QuizKind, prompt: string, answer: number, explain: string, co
 
 /** Questions per section, keyed "lectureId/sectionId". */
 export const quiz: Record<string, Question[]> = {
+  ...practiceQuiz,
   // ---------------- Start here ----------------
   "start/notation": [
     mc("formula", r`What does $\frac1N\sum_{n=1}^N a_n$ compute?`,

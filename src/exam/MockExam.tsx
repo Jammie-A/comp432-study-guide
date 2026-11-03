@@ -4,9 +4,27 @@ import { lectureShort } from "../lessons/types";
 import { Rich } from "../quiz/Quiz";
 import { ExamQuestion, FigureId, examPool } from "./questions";
 import { privateExam } from "../private";
+import { allQuestions } from "../quiz/store";
+import { MCQuestion, QuizItem } from "../quiz/types";
+
+// The practice track's five-option questions double as the "deep understanding" exam.
+const deepPool: ExamQuestion[] = allQuestions
+  .filter((q): q is QuizItem & MCQuestion => q.lecture === "practice" && q.type === "mc" && q.options.length === 5)
+  .map((q) => ({
+    id: q.id,
+    lecture: 7,
+    section: `${q.lecture}/${q.section}`,
+    points: 2,
+    prompt: q.prompt,
+    code: q.code,
+    options: q.options as ExamQuestion["options"],
+    answer: q.answer,
+    explain: q.explain,
+  }));
 
 // The public pool plus any local-only questions (see src/private.tsx).
-const pool: ExamQuestion[] = [...examPool, ...privateExam];
+const pool: ExamQuestion[] = [...examPool, ...privateExam, ...deepPool];
+const examOnly = pool.filter((q) => q.lecture !== 7);
 import { ArrowsFigure, EarlyStoppingFigure, LearningRateFigure, ZigzagFigure } from "./figures";
 
 const figures: Record<FigureId, () => ReactNode> = {
@@ -16,8 +34,8 @@ const figures: Record<FigureId, () => ReactNode> = {
   zigzag: ZigzagFigure,
 };
 
-type Mode = "full" | "quick" | "samples";
-const modeName: Record<Mode, string> = { full: "Full mock midterm", quick: "Quick practice", samples: "The 3 handout examples" };
+type Mode = "full" | "quick" | "samples" | "deep";
+const modeName: Record<Mode, string> = { full: "Full mock midterm", quick: "Quick practice", samples: "The 3 handout examples", deep: "Deep-understanding practice" };
 
 // Questions per lecture, mirroring "31 questions on lectures 1–5" plus 2 bonus.
 const FULL_PLAN: Record<number, number> = { 1: 4, 2: 7, 3: 7, 4: 6, 5: 7 };
@@ -59,6 +77,7 @@ function pick<T>(a: T[], n: number): T[] {
 
 function buildExam(mode: Mode): ExamQuestion[] {
   if (mode === "samples") return pool.filter((q) => q.sample);
+  if (mode === "deep") return pick(deepPool, 20);
   const plan = mode === "full" ? FULL_PLAN : QUICK_PLAN;
   const main = Object.entries(plan).flatMap(([lec, n]) =>
     pick(pool.filter((q) => !q.bonus && q.lecture === +lec), n),
@@ -219,9 +238,14 @@ export function MockExam() {
           <b>The 3 handout examples</b>
           <span>The sample questions from the slides, 8 min</span>
         </button>
+        <button onClick={() => start("deep")}>
+          <b>Deep-understanding practice</b>
+          <span>20 "what happens if", PyTorch-result and diagnosis questions, ≈ 53 min</span>
+        </button>
       </div>
       <p className="muted">
-        The pool has {pool.filter((q) => !q.bonus).length} questions + {pool.filter((q) => q.bonus).length} bonus;
+        The pool has {examOnly.filter((q) => !q.bonus).length} questions + {examOnly.filter((q) => q.bonus).length} bonus
+        (plus {deepPool.length} deep-understanding questions);
         each mock draws a new random set. Point values are my estimates of each question's effort (the real exam doesn't
         publish them in advance), and the answers to the handout examples are my own worked solutions — compare with your lab TA.
       </p>

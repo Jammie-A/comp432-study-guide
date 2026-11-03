@@ -8,8 +8,9 @@ The Labs track teaches the lab code itself. Each page has a table of every funct
 
 For the midterm:
 
-- **Check yourself** questions at the end of every section (180 in total, 178 on the shared site), mixed together on the Quiz page (`#/quiz`).
-- **Mock midterm** (`#/exam`) in the real exam's format: five options per question, −¼ for a wrong answer, 0 for a blank, a timer, two bonus questions, and a review with explanations. It includes the three example questions from the Lecture 5 handout.
+- **Check yourself** questions at the end of every section (278 in total, 276 on the shared site), mixed together on the Quiz page (`#/quiz`).
+- **Practice: think it through** (`#/practice/...`): deep-understanding training: what happens if you change a knob, predicting PyTorch results, diagnosing why a result is what it is, short math without a calculator, and topics from beyond the slides (tagged "Beyond the slides"). All PyTorch answers were checked by running the code.
+- **Mock midterm** (`#/exam`) in the real exam's format: five options per question, −¼ for a wrong answer, 0 for a blank, a timer, two bonus questions, and a review with explanations. It includes the three example questions from the Lecture 5 handout, and a deep-understanding mode that draws 20 questions from the practice chapter.
 - Formula boxes are tagged **On the formula sheet** or **Not on the sheet: memorize**, following the handout's description of the booklet.
 
 ## Run
@@ -37,6 +38,7 @@ Material close to graded lab-assignment solutions lives in `src/private/`, which
 - `src/lessons/labs.tsx`: the Labs 1–5 track (Python basics, NumPy, finite differences, from-scratch models and scikit-learn, PyTorch tensors and autograd, training an MLP, convolutions in code, debugging)
 - `src/widgets/`: interactive visuals for each lecture
 - `src/components/`: math rendering, step-by-step reveal, line-by-line code walkthroughs (`CodeWalk`), function tables (`FnRef`), Python cells, charts
+- `src/lessons/practice.tsx` and `src/quiz/practice.ts`: the practice chapter and its questions (five options each, so the mock exam can use them)
 - `src/quiz/questions.ts`: section quiz questions (multiple choice or numeric; `$...$` is math, `{{...}}` is inline code)
 - `src/exam/questions.ts`: the mock-midterm pool (five options each, with points); `src/exam/figures.tsx` draws its figures
 - `content-outline.md`: what each slide and lab covers, with page numbers

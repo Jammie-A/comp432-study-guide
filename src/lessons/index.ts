@@ -5,5 +5,6 @@ import { lecture3 } from "./l3";
 import { lecture4 } from "./l4";
 import { lecture5 } from "./l5";
 import { labs } from "./labs";
+import { practice } from "./practice";
 
-export const lectures = [basics, lecture1, lecture2, lecture3, lecture4, lecture5, labs];
+export const lectures = [basics, lecture1, lecture2, lecture3, lecture4, lecture5, labs, practice];

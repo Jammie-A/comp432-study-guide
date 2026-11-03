@@ -64,6 +64,7 @@ export function QuestionCard({ q, n, showSource }: { q: QuizItem; n?: number; sh
       <div className="qmeta">
         {n !== undefined && <span className="qnum">Q{n}</span>}
         <span className={`qkind ${q.kind}`}>{kindLabel[q.kind]}</span>
+        {q.extra && <span className="qextra">Beyond the slides</span>}
         {showSource && sec && (
           <a className="qsrc" href={`#/${q.lecture}/${q.section}`}>
             {lectureShort(lec!)} · {sec.title}
@@ -119,7 +120,12 @@ export function QuestionCard({ q, n, showSource }: { q: QuizItem; n?: number; sh
       {submitted && (
         <div className="qexplain">
           <Rich text={q.explain} />
-          {q.code && <PyCell code={q.code} title="Run it to check" />}
+          {q.code &&
+            (/\btorch\b/.test(q.code) ? (
+              <PyCell code={q.code} readOnly title="PyTorch can't run in the browser: this output was checked with real PyTorch" />
+            ) : (
+              <PyCell code={q.code} title="Run it to check" />
+            ))}
         </div>
       )}
     </div>
@@ -187,7 +193,7 @@ export function QuizPage() {
       <div className="eyebrow">Practice</div>
       <h1>Quiz</h1>
       <p className="summary">
-        {total} questions on formulas, hand calculations and predicting code output. Each one links back to the section it tests.
+        {total} questions on formulas, hand calculations, predicting code output and reasoning about what changes when. Each one links back to the section it tests.
       </p>
       <div className="quiz-stats">
         <div className="stat"><b>{right}</b>/{total} correct overall</div>
@@ -211,7 +217,7 @@ export function QuizPage() {
           ))}
         </div>
         <div className="toggle-row">
-          {(["all", "formula", "calc", "code"] as const).map((k) => (
+          {(["all", "formula", "calc", "code", "reason"] as const).map((k) => (
             <button key={k} className={kind === k ? "" : "off"} onClick={() => setKind(k)}>
               {k === "all" ? "All types" : kindLabel[k]}
             </button>
